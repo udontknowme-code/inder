@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<title>Inder - Fake Tinder Simulator</title>
+
+<style>
+body{
+  margin:0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg,#ff416c,#ff4b2b);
+  color:white;
+  text-align:center;
+}
+
+h1{
+  padding:20px;
+}
+
+.container{
+  max-width:350px;
+  margin:auto;
+}
+
+.card{
+  background:white;
+  color:black;
+  border-radius:20px;
+  padding:15px;
+  box-shadow:0 5px 20px rgba(0,0,0,0.3);
+  margin-bottom:15px;
+  animation:fade 0.5s;
+}
+
+.card img{
+  width:100%;
+  border-radius:15px;
+}
+
+button{
+  border:none;
+  padding:10px 20px;
+  margin:5px;
+  border-radius:20px;
+  font-size:16px;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.like{ background:#ff4b2b; color:white;}
+.dislike{ background:#ccc;}
+.choice{ background:#ff416c; color:white; width:90%;}
+
+button:hover{
+  transform:scale(1.05);
+}
+
+#chatBox{
+  background:white;
+  color:black;
+  height:200px;
+  overflow-y:auto;
+  padding:10px;
+  border-radius:15px;
+  margin-bottom:10px;
+  text-align:left;
+}
+
+.msgYou{ color:#ff416c; }
+.msgThem{ color:#333; }
+
+@keyframes fade{
+  from{opacity:0; transform:translateY(20px);}
+  to{opacity:1; transform:translateY(0);}
+}
+</style>
+</head>
+
+<body>
+
+<h1>🔥 Inder</h1>
+
+<div class="container">
+
+<div id="profileCard" class="card">
+  <img id="photo">
+  <h2 id="name"></h2>
+  <p id="age"></p>
+</div>
+
+<div id="profileButtons">
+  <button class="dislike" onclick="nextProfile()">❌</button>
+  <button class="like" onclick="startChat()">❤️</button>
+</div>
+
+<div id="chat" style="display:none">
+  <div id="chatBox"></div>
+
+  <div id="choices"></div>
+
+  <button onclick="backToProfiles()">⬅ Zpět</button>
+</div>
+
+</div>
+
+<script>
+let profiles=[
+{
+name:"Raj",
+age:26,
+photo:"https://ichef.bbci.co.uk/news/976/cpsprodpb/9AFF/production/_90397693_mediaitem90395534.jpg",
+dialog:[
+{
+text:"Hello dear, nice to meet you ❤️",
+choices:[
+{reply:"Ahoj 😊", response:"You seem nice. Want to invest in crypto with me?"},
+{reply:"Co chceš?", response:"I have special business offer for you!"}
+]
+},
+{
+text:"I can make you rich very fast 💰",
+choices:[
+{reply:"Jak?", response:"Just send $20 first, it's totally safe."},
+{reply:"To zní podezřele", response:"No no, trust me, huge profits."}
+]
+}
+]
+},
+{
+name:"Arjun",
+age:28,
+photo:"https://i.imgflip.com/4/1u18zi.jpg",
+dialog:[
+{
+text:"Hello friend!",
+choices:[
+{reply:"Čau", response:"You win Amazon gift card!"},
+{reply:"Proč mi píšeš?", response:"I select you for prize."}
+]
+},
+{
+text:"To claim reward send verification fee",
+choices:[
+{reply:"Kolik?", response:"Only $5, quick claim."},
+{reply:"To je scam", response:"No scam, 100% legit, hurry!"}
+]
+}
+]
+},
+{
+name:"Ravi",
+age:27,
+photo:"https://tse4.mm.bing.net/th/id/OIP.1jo6jRPKunuoX6FxSf_1vwHaLH?pid=Api&P=0&h=220",
+dialog:[
+{
+text:"Hi dear, want free iPhone?",
+choices:[
+{reply:"Opravdu?", response:"Yes! Send $5 for shipping."},
+{reply:"To je podvod", response:"No scam, fast delivery!"}
+]
+},
+{
+text:"Other prizes also available",
+choices:[
+{reply:"Jaké?", response:"Gift cards, crypto, and more!"},
+{reply:"Ne děkuji", response:"Don't miss golden chance!"}
+]
+}
+]
+},
+{
+name:"Siddharth",
+age:29,
+photo:"https://d2kpu7m6sms0zn.cloudfront.net/0bdfea035a028e2202b6508b48e3300b.jpg",
+dialog:[
+{
+text:"Hello! You look amazing 😘",
+choices:[
+{reply:"Děkuji", response:"You can join my crypto group for profit."},
+{reply:"Co nabízíš?", response:"Send $15, I show secret tips."}
+]
+},
+{
+text:"Don't miss opportunity!",
+choices:[
+{reply:"Jak?", response:"Fast profits, send money now."},
+{reply:"Ne, děkuji", response:"Others already earning big."}
+]
+}
+]
+},
+{
+name:"Karan",
+age:27,
+photo:"https://i.pinimg.com/originals/78/f6/f8/78f6f81bff3ca3945c14333e13c7bd41.jpg",
+dialog:[
+{
+text:"Hello, win gift card 💳",
+choices:[
+{reply:"Kolik?", response:"Send $5 to claim Amazon card."},
+{reply:"To je scam", response:"No scam, 100% legit!"}
+]
+},
+{
+text:"Other prizes available",
+choices:[
+{reply:"Jaké?", response:"Crypto, phones, gift vouchers."},
+{reply:"Ne, děkuji", response:"Don't miss chance of a lifetime!"}
+]
+}
+]
+},
+{
+name:"Amir",
+age:24,
+photo:"https://www.hindustantimes.com/ht-img/img/2023/04/15/550x309/memes-xavier-uncle-law-indentity-hidden-viral_1681556671055_1681556671319_1681556671319.jpg",
+dialog:[
+{
+text:"Hi, I can make you rich 💰",
+choices:[
+{reply:"Jak?", response:"Invest $20, I double instantly."},
+{reply:"Ne, děkuji", response:"Others already profited!"}
+]
+},
+{
+text:"Act fast!",
+choices:[
+{reply:"Dobře", response:"Send now to secure your slot."},
+{reply:"Ne", response:"Opportunity lost!"}
+]
+}
+]
+}
+];
+
+let index=0;
+let dialogIndex=0;
+let currentProfile=null;
+
+function showProfile(){
+  let p=profiles[index];
+  document.getElementById("photo").src=p.photo;
+  document.getElementById("name").innerText=p.name;
+  document.getElementById("age").innerText=p.age+" let";
+}
+
+function nextProfile(){
+  index=(index+1)%profiles.length;
+  showProfile();
+}
+
+function startChat(){
+  currentProfile=profiles[index];
+  dialogIndex=0;
+
+  document.getElementById("profileCard").style.display="none";
+  document.getElementById("profileButtons").style.display="none";
+  document.getElementById("chat").style.display="block";
+
+  document.getElementById("chatBox").innerHTML="";
+  showDialog();
+}
+
+function showDialog(){
+  if(dialogIndex>=currentProfile.dialog.length){
+    document.getElementById("choices").innerHTML="<p>Konec konverzace 😈</p>";
+    return;
+  }
+
+  let d=currentProfile.dialog[dialogIndex];
+
+  addMsg(currentProfile.name,d.text,"msgThem");
+
+  let choicesHTML="";
+  d.choices.forEach((c,i)=>{
+    choicesHTML+=`<button class="choice" onclick="choose(${i})">${c.reply}</button>`;
+  });
+
+  document.getElementById("choices").innerHTML=choicesHTML;
+}
+
+function choose(i){
+  let d=currentProfile.dialog[dialogIndex];
+  let choice=d.choices[i];
+
+  addMsg("Ty",choice.reply,"msgYou");
+
+  setTimeout(()=>{
+    addMsg(currentProfile.name,choice.response,"msgThem");
+  },600);
+
+  dialogIndex++;
+  setTimeout(showDialog,1200);
+}
+
+function addMsg(name,text,className){
+  let box=document.getElementById("chatBox");
+  box.innerHTML+=`<p class="${className}"><b>${name}:</b> ${text}</p>`;
+  box.scrollTop=box.scrollHeight;
+}
+
+function backToProfiles(){
+  document.getElementById("chat").style.display="none";
+  document.getElementById("profileCard").style.display="block";
+  document.getElementById("profileButtons").style.display="block";
+}
+
+showProfile();
+</script>
+
+</body>
+</html>
